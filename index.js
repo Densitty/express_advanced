@@ -15,11 +15,25 @@ app.use(cookieParser());
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
+// middleware to extract from the query string
+app.use((req, res, next) => {
+  if (req.query.status === "fail") {
+    res.locals.msg =
+      "Sorry. This username and password is incorrect. Please enter the correct details";
+  } else {
+    res.locals.msg = ``;
+  }
+  // send me to the next piece of middleware
+  next();
+});
+
 app.get("/", (req, res) => {
   res.send("Are we still OK?");
 });
 
 app.get("/login", (req, res, next) => {
+  // the request object has a query property in express, where we put all insecure data
+  console.log(req.query);
   res.render("login");
 });
 
@@ -34,7 +48,10 @@ app.post("/process_login", (req, res) => {
     res.cookie("username", username);
     res.redirect("/welcome");
   } else {
-    res.redirect("/login?msg=fail");
+    // "?" is a delimiter
+    // everything before "?" is the actual path
+    // everything after "?" is the query string and it's a key:value pair. More than one string gets separated by '&'
+    res.redirect("/login?status=fail&message=incorrect details");
   }
   // res.json(req.body);
 });
@@ -47,6 +64,25 @@ app.get("/welcome", (req, res) => {
     username: req.cookies.username,
   });
 });
+
+app.get("/story/:storyID", (req, res) => {
+  res.send(`<h2>Story ${req.params.storyID}</h2>`);
+});
+
+app.get("/story/:storyID/:chapter", (req, res) => {
+  res.send(`<h2>Story ${req.params.storyID} - ${req.params.chapter}</h2>`);
+});
+
+/* instead of having 3 routes to different pages, as below, we use req. params above for a single request to multiple routes */
+/*
+app.get("/story/1", (req, res) => {
+  res.send("<h1>Story 1</h1>");
+});
+
+app.get("/story/2", (req, res) => {
+  res.send("<h1>Story 1</h1>");
+});
+*/
 
 // on clicking logout
 app.get("/logout", (req, res, next) => {
