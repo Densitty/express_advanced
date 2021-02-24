@@ -73,16 +73,15 @@ app.get("/story/:storyID/:chapter", (req, res) => {
   res.send(`<h2>Story ${req.params.storyID} - ${req.params.chapter}</h2>`);
 });
 
-/* instead of having 3 routes to different pages, as below, we use req. params above for a single request to multiple routes */
-/*
-app.get("/story/1", (req, res) => {
-  res.send("<h1>Story 1</h1>");
+app.get("/statement", (req, res, next) => {
+  // the below renders the image onto the browser, not want we want
+  // res.sendFile(path.join(__dirname, "images/product-1.jpg"));
+  // however, app has a download method
+  res.download(
+    path.join(__dirname, "images/product-1.jpg"),
+    "Sample_Sweat-Shirt.jpg"
+  );
 });
-
-app.get("/story/2", (req, res) => {
-  res.send("<h1>Story 1</h1>");
-});
-*/
 
 // on clicking logout
 app.get("/logout", (req, res, next) => {
